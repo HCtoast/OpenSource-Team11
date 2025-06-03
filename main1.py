@@ -6,6 +6,7 @@ from sprites.player import Player
 from sprites.npc import NPC
 from sprites.projectile import Projectile, load_projectile_sprites
 from sprites.projectile_types import PROJECTILE_TYPES
+from sprites.navmesh_animator import NavMeshAnimator
 
 def main():
     
@@ -48,13 +49,19 @@ def main():
     projectile_type = PROJECTILE_TYPES["yellow"] # 투사체 색(특성) 가져오기
     projectile_timer = 0
     projectile_cooldown = projectile_type["cooldown"] # 투사체 발사간격 가져오기
-    
+
+    # 적 추격 알고리즘 생성
+    animator = NavMeshAnimator(32, SCREEN_WIDTH, SCREEN_HEIGHT)
+    animator.SetPosition(npc.rect.x, npc.rect.y)
     
     # 게임 루프
     running = True
     clock = pygame.time.Clock()
     
     while running:
+        # 델타 타임
+        dt = clock.tick(60) / 1000.0
+        
         # 이벤트 처리
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -64,6 +71,14 @@ def main():
         keys = pygame.key.get_pressed()
         player.update(keys)
         npc.update()
+        
+
+        # AI 적추격 알고리즘 결과값을 npc 위치정보에 이식
+        animator.SetTargetPosition(player.rect.x, player.rect.y)
+        animator.SetPosition(npc.rect.x, npc.rect.y)
+        x, y = animator.update(dt)
+        npc.rect.x = x
+        npc.rect.y = y
         
         # 투사체 쿨다운 타이머 증가
         projectile_timer += clock.get_time()
