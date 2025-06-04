@@ -31,6 +31,7 @@ class NPC(pygame.sprite.Sprite):
         self.current_frame = 0
         self.image = self.frames[self.current_state][self.current_frame]
         self.rect = self.image.get_rect(center=(x, y))
+        self.health = 100
         
         # AI 관련 변수
         self.speed = 1
@@ -104,3 +105,8 @@ class NPC(pygame.sprite.Sprite):
             if self.current_state in self.frames and self.frames[self.current_state]:
                 self.current_frame = (self.current_frame + 1) % len(self.frames[self.current_state])
                 self.image = self.frames[self.current_state][self.current_frame]
+    
+    def take_damage(self, amount):
+        self.health -= amount
+        if self.health <= 0:
+            self.kill()

@@ -6,7 +6,6 @@ def load_projectile_sprites(sheet_path):
     sheet = pygame.image.load(sheet_path).convert_alpha()
     return load_projectile_frames(sheet, frame_width=16, frame_height=16, rows=6, cols=5)
 
-
 # 투사체 애니메이션
 def load_projectile_frames(sheet, frame_width, frame_height, rows, cols):
     sprites = []
@@ -26,7 +25,7 @@ def load_projectile_frames(sheet, frame_width, frame_height, rows, cols):
     return sprites
 
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, x, y, target_x, target_y, frames, speed, damage):
+    def __init__(self, x, y, target_x, target_y, frames, speed, damage, owner):
         super().__init__()
         self.frames = frames
         self.frame_index = 0
@@ -37,6 +36,9 @@ class Projectile(pygame.sprite.Sprite):
         
         self.image = self.frames[self.frame_index]
         self.rect = self.image.get_rect(center=(x, y))
+
+        # 충돌 판정을 위한 mask 정의
+        self.mask = pygame.mask.from_surface(self.image)
 
         # 투사체 위치 저장용
         self.pos_x = float(self.rect.centerx)
@@ -50,6 +52,7 @@ class Projectile(pygame.sprite.Sprite):
         self.vy = math.sin(angle) * speed
 
         self.damage = damage
+        self.owner = owner
 
 
     def update(self, dt):

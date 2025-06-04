@@ -34,7 +34,10 @@ class Player(pygame.sprite.Sprite):
         self.current_frame = 0
         self.image = self.frames[self.current_state][self.current_frame]
         self.rect = self.image.get_rect(center=(x, y))
-        
+
+        # 충돌 판정을 위한 mask 정의
+        self.mask = pygame.mask.from_surface(self.image)
+
         # 이동 관련 변수
         self.speed = 3
         self.direction = 'down'  # 현재 바라보는 방향
@@ -106,3 +109,8 @@ class Player(pygame.sprite.Sprite):
             if self.current_state in self.frames and self.frames[self.current_state]:
                 self.current_frame = (self.current_frame + 1) % len(self.frames[self.current_state])
                 self.image = self.frames[self.current_state][self.current_frame]
+    
+    def take_damage(self, amount):
+            self.hp -= amount
+            if self.hp <= 0:
+                self.kill()

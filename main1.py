@@ -7,6 +7,10 @@ from sprites.npc import NPC
 from sprites.projectile import Projectile, load_projectile_sprites
 from sprites.projectile_types import PROJECTILE_TYPES
 
+# 충돌 처리를 위한 group 분리
+npc_group = pygame.sprite.Group()
+player_group = pygame.sprite.Group()
+
 def main():
     
     """메인 게임 함수"""
@@ -35,8 +39,10 @@ def main():
     
     # 플레이어 및 NPC 생성
     player = Player(SCREEN_WIDTH//2, SCREEN_HEIGHT//2)
+    player_group.add(player)
+
     npc = NPC(SCREEN_WIDTH//2 + 100, SCREEN_HEIGHT//2)
-    
+    npc_group.add(npc)
     
     # 투사체 생성
     projectile_sprites = load_projectile_sprites("assets/images/projectiles.png")
@@ -48,7 +54,7 @@ def main():
     projectile_type = PROJECTILE_TYPES["yellow"] # 투사체 색(특성) 가져오기
     projectile_timer = 0
     projectile_cooldown = projectile_type["cooldown"] # 투사체 발사간격 가져오기
-    
+
     
     # 게임 루프
     running = True
@@ -84,17 +90,30 @@ def main():
                 player.rect.centerx, player.rect.centery,
                 projectile_sprites[index],
                 speed=speed,
-                damage=damage
-        )
+                damage=damage,
+                owner=npc
+            )
             # 투사체 group에 추가(화면 벗어나면 삭제됨)
             projectiles.add(proj)
 
         # 투사체 위치 업뎃
         projectiles.update(clock.get_time())
 
-        
-        
-        
+        # NPC 충돌 처리
+        collisions = pygame.sprite.groupcollide(npc_group, projectiles, False, False)
+        for target, hit_projectiles in collisions.items():
+            for proj in hit_projectiles:
+                if proj.owner != target:
+                    if hasattr(target, 'take_damage'):
+                        target.take_damage(proj.damage)
+                    proj.kill()
+
+        # 플레이어 충돌 처리
+        player_collisions = pygame.sprite.spritecollide(player, projectiles, False, pygame.sprite.collide_mask)
+        for proj in player_collisions:
+            if proj.owner != player:
+                player.take_damage(proj.damage)
+                proj.kill()
         
         # UI 업데이트 (예시 값 사용)
         game_ui.update(
@@ -122,5 +141,11 @@ def main():
     pygame.quit()
     sys.exit()
 
+# 디버깅용 try 처리
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()  # 오류 전체 출력
+        input("오류가 발생했습니다. Enter를 눌러 종료합니다...")
