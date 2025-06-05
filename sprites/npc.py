@@ -44,6 +44,9 @@ class NPC(pygame.sprite.Sprite):
         # 애니메이션 타이밍 설정
         self.animation_speed = 200  # NPC는 더 느린 애니메이션
         self.last_update = pygame.time.get_ticks()
+
+        self.projectile_timer = 0
+        self.projectile_cooldown = 800  # Projectile_type 에서 가져오는게 아닌, 임시로 800 할당.
         
         print(f"NPC 생성 완료 - 위치: ({x}, {y})")
 

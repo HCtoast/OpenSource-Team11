@@ -43,6 +43,9 @@ def main():
 
     npc = NPC(SCREEN_WIDTH//2 + 100, SCREEN_HEIGHT//2)
     npc_group.add(npc)
+    for i in range(3):  # 3마리 추가 생성
+        npc = NPC(200 + i * 200, 200)
+        npc_group.add(npc)
     
     # 투사체 생성
     projectile_sprites = load_projectile_sprites("assets/images/projectiles.png")
@@ -52,8 +55,8 @@ def main():
     
     # (임시) 기본 투사체 설정(projectile_types 참조)
     projectile_type = PROJECTILE_TYPES["yellow"] # 투사체 색(특성) 가져오기
-    projectile_timer = 0
-    projectile_cooldown = projectile_type["cooldown"] # 투사체 발사간격 가져오기
+    # projectile_timer = 0
+    # projectile_cooldown = projectile_type["cooldown"] # 투사체 발사간격 가져오기
 
     # (임시) Player 투사체 설정
     player_projectile_type = PROJECTILE_TYPES["blue"]
@@ -74,32 +77,34 @@ def main():
         # 게임 상태 업데이트
         keys = pygame.key.get_pressed()
         player.update(keys)
-        npc.update()
-        
-        # 투사체 쿨다운 타이머 증가
-        projectile_timer += clock.get_time()
-        
-        # 쿨타임을 넘어서면 0으로 타이머 리셋시킴
-        if projectile_timer >= projectile_cooldown:
-            projectile_timer = 0  # 타이머 리셋
+        for npc in npc_group:
+            npc.update()
 
-       # 현재 projectile_type에서 속성 추출
-            index = projectile_type["index"]
-            speed = projectile_type["speed"]
-            damage = projectile_type["damage"]
+            # npc 마다 개별적용.
+            # 투사체 쿨다운 타이머 증가
+            npc.projectile_timer += clock.get_time()
+            
+            # 쿨타임을 넘어서면 0으로 타이머 리셋시킴
+            if npc.projectile_timer >= npc.projectile_cooldown:
+                npc.projectile_timer = 0  # 타이머 리셋
 
-            # type에 맞는 속성 적용한 투사체 만들기
-            proj = Projectile( 
-                # 플레이어 위치와 NPC 위치를 참조(둘 다 중앙에서 시작)하여 속도를 정함
-                npc.rect.centerx, npc.rect.centery,
-                player.rect.centerx, player.rect.centery,
-                projectile_sprites[index],
-                speed=speed,
-                damage=damage,
-                owner=npc
-            )
-            # 투사체 group에 추가(화면 벗어나면 삭제됨)
-            projectiles.add(proj)
+        # 현재 projectile_type에서 속성 추출
+                index = projectile_type["index"]
+                speed = projectile_type["speed"]
+                damage = projectile_type["damage"]
+
+                # type에 맞는 속성 적용한 투사체 만들기
+                proj = Projectile( 
+                    # 플레이어 위치와 NPC 위치를 참조(둘 다 중앙에서 시작)하여 속도를 정함
+                    npc.rect.centerx, npc.rect.centery,
+                    player.rect.centerx, player.rect.centery,
+                    projectile_sprites[index],
+                    speed=speed,
+                    damage=damage,
+                    owner=npc
+                )
+                # 투사체 group에 추가(화면 벗어나면 삭제됨)
+                projectiles.add(proj)
 
         player_projectile_timer += clock.get_time()
 
@@ -153,7 +158,9 @@ def main():
         
         # 스프라이트 그리기
         screen.blit(player.image, player.rect)
-        screen.blit(npc.image, npc.rect)
+        # npc가 kill 당해서 npc_group에서 빠지면 그리지 않음.
+        for npc in npc_group:
+            screen.blit(npc.image, npc.rect)
         
         projectiles.draw(screen)
         
