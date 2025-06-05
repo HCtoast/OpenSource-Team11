@@ -55,6 +55,11 @@ def main():
     projectile_timer = 0
     projectile_cooldown = projectile_type["cooldown"] # 투사체 발사간격 가져오기
 
+    # (임시) Player 투사체 설정
+    player_projectile_type = PROJECTILE_TYPES["blue"]
+    player_projectile_timer = 0
+    player_projectile_cooldown = projectile_type["cooldown"]
+
     
     # 게임 루프
     running = True
@@ -94,6 +99,26 @@ def main():
                 owner=npc
             )
             # 투사체 group에 추가(화면 벗어나면 삭제됨)
+            projectiles.add(proj)
+
+        player_projectile_timer += clock.get_time()
+
+        if player_projectile_timer >= player_projectile_cooldown:
+            player_projectile_timer = 0
+
+            # 플레이어가 투사체 발사 (NPC를 향해)
+            p_index = player_projectile_type["index"]
+            p_speed = player_projectile_type["speed"]
+            p_damage = player_projectile_type["damage"]
+
+            proj = Projectile(
+                player.rect.centerx, player.rect.centery,
+                npc.rect.centerx, npc.rect.centery,
+                projectile_sprites[p_index],
+                speed=p_speed,
+                damage=p_damage,
+                owner=player
+            )
             projectiles.add(proj)
 
         # 투사체 위치 업뎃
