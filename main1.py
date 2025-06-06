@@ -79,6 +79,17 @@ def main():
         # 게임 상태 업데이트
         keys = pygame.key.get_pressed()
         player.update(keys)
+        
+        
+        # 플레이어 경험치 
+        if player.exp >= 100: 
+            for weapon in player.weapons:
+                weapon.upgradeweapon()
+            player.exp = 0    
+            player.level +=1
+        
+        
+        
         for npc in npc_group:
             npc.update()
 
@@ -108,15 +119,18 @@ def main():
                 # 투사체 group에 추가(화면 벗어나면 삭제됨)
                 projectiles.add(proj)
         
+        # 무기
         for weapon in player.weapons:
             if weapon.acquired:
                 weapon.update_timer(clock.get_time())
                 if weapon.can_fire():
                     if isinstance(weapon, BulletGun):
+                        
                         proj = weapon.fire(player, npc, projectile_sprites)
                         projectiles.add(proj)
                     elif isinstance(weapon, LaserGun):
                         weapon.fire(player, npc_group)
+                        
 
         # 투사체 위치 업뎃
         projectiles.update(clock.get_time())
@@ -127,7 +141,9 @@ def main():
             for proj in hit_projectiles:
                 if proj.owner != target:
                     if hasattr(target, 'take_damage'):
-                        target.take_damage(proj.damage)
+                        dead = target.take_damage(proj.damage)
+                        if dead:
+                            player.exp += 50
                     proj.kill()
 
         # 플레이어 충돌 처리
