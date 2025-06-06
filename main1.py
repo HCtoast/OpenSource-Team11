@@ -6,6 +6,8 @@ from sprites.player import Player
 from sprites.npc import NPC
 from sprites.projectile import Projectile, load_projectile_sprites
 from sprites.projectile_types import PROJECTILE_TYPES
+from weapon.bullet_gun import BulletGun
+from weapon.laser_gun import LaserGun
 
 # 충돌 처리를 위한 group 분리
 npc_group = pygame.sprite.Group()
@@ -105,26 +107,16 @@ def main():
                 )
                 # 투사체 group에 추가(화면 벗어나면 삭제됨)
                 projectiles.add(proj)
-
-        player_projectile_timer += clock.get_time()
-
-        if player_projectile_timer >= player_projectile_cooldown:
-            player_projectile_timer = 0
-
-            # 플레이어가 투사체 발사 (NPC를 향해)
-            p_index = player_projectile_type["index"]
-            p_speed = player_projectile_type["speed"]
-            p_damage = player_projectile_type["damage"]
-
-            proj = Projectile(
-                player.rect.centerx, player.rect.centery,
-                npc.rect.centerx, npc.rect.centery,
-                projectile_sprites[p_index],
-                speed=p_speed,
-                damage=p_damage,
-                owner=player
-            )
-            projectiles.add(proj)
+        
+        for weapon in player.weapons:
+            if weapon.acquired:
+                weapon.update_timer(clock.get_time())
+                if weapon.can_fire():
+                    if isinstance(weapon, BulletGun):
+                        proj = weapon.fire(player, npc, projectile_sprites)
+                        projectiles.add(proj)
+                    elif isinstance(weapon, LaserGun):
+                        weapon.fire(player, npc_group)
 
         # 투사체 위치 업뎃
         projectiles.update(clock.get_time())
