@@ -24,3 +24,6 @@ class LaserGun(Weapon):
 
         if closest_target:
             closest_target.take_damage(self.calculate_damage())
+            
+    def upgradeweapon(self):
+        pass

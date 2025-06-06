@@ -5,6 +5,7 @@ class Weapon:
         self.cooldown = cooldown
         self.level = 1
         self.timer = 0
+        self.projectilespeed = 5
         self.acquired = False
 
     def calculate_damage(self):
@@ -21,4 +22,7 @@ class Weapon:
         return False
 
     def fire(self, attacker, target, context):
+        raise NotImplementedError  # 자식 클래스에서 override
+    
+    def upgradeweapon(self): 
         raise NotImplementedError  # 자식 클래스에서 override

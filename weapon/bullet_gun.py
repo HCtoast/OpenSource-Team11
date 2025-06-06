@@ -5,6 +5,7 @@ class BulletGun(Weapon):
     def __init__(self, sprite_index):
         super().__init__("Bullet Gun", base_damage=10, cooldown=400)
         self.sprite_index = sprite_index
+        self.projectilespeed = 6
 
     def fire(self, attacker, target, projectile_sprites):
         proj = Projectile(
@@ -13,8 +14,14 @@ class BulletGun(Weapon):
             target_x=target.rect.centerx,
             target_y=target.rect.centery,
             frames=projectile_sprites[self.sprite_index],
-            speed=6,
+            speed=self.projectilespeed,
             damage=self.calculate_damage(),
             owner=attacker
         )
         return proj
+    
+    def upgradeweapon(self):
+        self.level += 1
+        self.base_damage += 1
+        self.projectilespeed += 1
+        self.cooldown -= 100 
