@@ -10,14 +10,16 @@ class StartScreen:
         self.screen = screen
         self.font = font
         # 제목 및 안내 텍스트 렌더링
-        self.title_text = self.font.render("Survival game", True, (255, 255, 255))
-        self.start_text = self.font.render("Press any key", True, (200, 200, 200))
+        #self.title_text = self.font.render("Survival game", True, (255, 255, 255))
+        #self.start_text = self.font.render("Press any key", True, (200, 200, 200))
 
     def draw(self):
         """
         시작화면을 그리는 함수
         """
-        self.screen.fill((10, 10, 20))  # 어두운 배경
+        background = pygame.image.load("assets//images//Start_Screen.png").convert()
+        background = pygame.transform.scale(background, (800,600))
+        """
         screen_rect = self.screen.get_rect()
         # 제목 텍스트 중앙 위쪽에 표시
         self.screen.blit(
@@ -29,6 +31,8 @@ class StartScreen:
             self.start_text,
             self.start_text.get_rect(center=(screen_rect.centerx, screen_rect.centery + 30))
         )
+        """
+        self.screen.blit(background, (0, 0))
         pygame.display.flip()  # 화면 갱신
 
     def wait_for_key(self):
