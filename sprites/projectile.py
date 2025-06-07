@@ -25,7 +25,7 @@ def load_projectile_frames(sheet, frame_width, frame_height, rows, cols):
     return sprites
 
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, x, y, target_x, target_y, frames, speed, damage, owner):
+    def __init__(self, x, y, target_x, target_y, frames, speed, damage, owner, pierce = 0):
         super().__init__()
         self.frames = frames
         self.frame_index = 0
@@ -53,6 +53,7 @@ class Projectile(pygame.sprite.Sprite):
 
         self.damage = damage
         self.owner = owner
+        self.pierce = pierce
 
 
     def update(self, dt):

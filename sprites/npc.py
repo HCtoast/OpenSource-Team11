@@ -113,3 +113,5 @@ class NPC(pygame.sprite.Sprite):
         self.health -= amount
         if self.health <= 0:
             self.kill()
+            return True
+        return False

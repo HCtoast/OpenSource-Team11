@@ -6,7 +6,10 @@ from sprites.player import Player
 from sprites.npc import NPC
 from sprites.projectile import Projectile, load_projectile_sprites
 from sprites.projectile_types import PROJECTILE_TYPES
-
+from weapon.bullet_gun import BulletGun
+from weapon.laser_gun import LaserGun
+from weapon.cross_gun import CrossGun
+from map1_view import View_Map
 # 충돌 처리를 위한 group 분리
 npc_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
@@ -62,6 +65,9 @@ def main():
     player_projectile_type = PROJECTILE_TYPES["blue"]
     player_projectile_timer = 0
     player_projectile_cooldown = projectile_type["cooldown"]
+    #맵 객체생성
+    view_Map = View_Map("assets/map/map1.tmx")
+    # TMX 맵 초기화
 
     
     # 게임 루프
@@ -69,6 +75,10 @@ def main():
     clock = pygame.time.Clock()
     
     while running:
+                
+        # 화면 그리기
+        view_Map.draw_stretched_to_screen(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
+        
         # 이벤트 처리
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -77,6 +87,17 @@ def main():
         # 게임 상태 업데이트
         keys = pygame.key.get_pressed()
         player.update(keys)
+        
+        
+        # 플레이어 경험치 
+        if player.exp >= 100: 
+            for weapon in player.weapons:
+                weapon.upgradeweapon()
+            player.exp = 0    
+            player.level +=1
+        
+        
+        
         for npc in npc_group:
             npc.update()
 
@@ -105,26 +126,21 @@ def main():
                 )
                 # 투사체 group에 추가(화면 벗어나면 삭제됨)
                 projectiles.add(proj)
-
-        player_projectile_timer += clock.get_time()
-
-        if player_projectile_timer >= player_projectile_cooldown:
-            player_projectile_timer = 0
-
-            # 플레이어가 투사체 발사 (NPC를 향해)
-            p_index = player_projectile_type["index"]
-            p_speed = player_projectile_type["speed"]
-            p_damage = player_projectile_type["damage"]
-
-            proj = Projectile(
-                player.rect.centerx, player.rect.centery,
-                npc.rect.centerx, npc.rect.centery,
-                projectile_sprites[p_index],
-                speed=p_speed,
-                damage=p_damage,
-                owner=player
-            )
-            projectiles.add(proj)
+        
+        # 무기
+        for weapon in player.weapons:
+            if weapon.acquired:
+                weapon.update_timer(clock.get_time())
+                if weapon.can_fire():
+                    if isinstance(weapon, BulletGun):
+                        proj = weapon.fire(player, npc, projectile_sprites)
+                        projectiles.add(proj)
+                    if isinstance(weapon, CrossGun):
+                        proj = weapon.fire(player, npc, projectile_sprites)
+                        projectiles.add(proj)
+                    elif isinstance(weapon, LaserGun):
+                        weapon.fire(player, npc_group)
+                        
 
         # 투사체 위치 업뎃
         projectiles.update(clock.get_time())
@@ -135,8 +151,12 @@ def main():
             for proj in hit_projectiles:
                 if proj.owner != target:
                     if hasattr(target, 'take_damage'):
-                        target.take_damage(proj.damage)
-                    proj.kill()
+                        dead = target.take_damage(proj.damage)
+                        if dead:
+                            player.exp += 50
+                        proj.pierce -= 1  # 관통 수 감소
+                        if proj.pierce < 0:
+                            proj.kill()
 
         # 플레이어 충돌 처리
         player_collisions = pygame.sprite.spritecollide(player, projectiles, False, pygame.sprite.collide_mask)
@@ -151,10 +171,7 @@ def main():
             exp=player.exp,  # 실제 경험치 값 연결
             level=player.level  # 실제 레벨 값 연결
         )
-        
-        # 화면 그리기
-        screen.fill((30, 30, 30))
-    
+
         
         # 스프라이트 그리기
         screen.blit(player.image, player.rect)
