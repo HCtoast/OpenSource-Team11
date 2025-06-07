@@ -39,4 +39,24 @@ PROJECTILE_TYPES = {
         "cooldown": 800,
         "damage": 6,
     },
+        "dagger": {
+        "index": 6,
+        "speed": 5,
+        "cooldown": 600,
+        "damage": 6,
+    },
+       "cross": {
+        "index": 7,
+        "speed": 5,
+        "cooldown": 600,
+        "damage": 6,
+    },
+       "bomb": {
+        "index": 8,
+        "speed": 5,
+        "cooldown": 600,
+        "damage": 6,
+    },
+    
+    
 }

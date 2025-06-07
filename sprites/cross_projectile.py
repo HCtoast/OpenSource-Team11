@@ -4,6 +4,11 @@ from .projectile import Projectile
 
 class CrossProjectile(Projectile):
     def __init__(self, x, y, target_x, target_y, frames, speed, damage, owner, max_distance=800):
+        
+        self.rotation_angle = 0  
+        self.rotate_speed = 3  # 투사체 회전 속도(이펙트용)
+        
+        
         super().__init__(x, y, target_x, target_y, frames, speed, damage, owner, pierce=999)
         self.origin = pygame.math.Vector2(x, y)
         self.pos = pygame.math.Vector2(x, y)
@@ -42,6 +47,20 @@ class CrossProjectile(Projectile):
             self.animation_timer = 0
             self.frame_index = (self.frame_index + 1) % len(self.frames)
             self.image = self.frames[self.frame_index]
+            
+            
+            
+        # 회전 효과 추가
+        self.rotation_angle = (self.rotation_angle + self.rotate_speed) % 360
+        self.image = pygame.transform.rotate(self.image, self.rotation_angle)
+
+        # 중심 맞추기
+        self.rect = self.image.get_rect(center=self.rect.center)
+
+        # 충돌 판정을 위한 마스크 업데이트
+        self.mask = pygame.mask.from_surface(self.image)
+        
+        
 
         # 누적 거리 계산
         self.distance_traveled += movement.length()
