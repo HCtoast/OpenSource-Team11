@@ -24,8 +24,8 @@ PROJECTILE_TYPES = {
     "green": {
         "index": 3,
         "speed": 5,
-        "cooldown": 800,
-        "damage": 4,
+        "cooldown": 3200,
+        "damage": 30,
     },
     "purple": {
         "index": 4,

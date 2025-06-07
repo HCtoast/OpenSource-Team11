@@ -8,6 +8,7 @@ from sprites.projectile import Projectile, load_projectile_sprites
 from sprites.projectile_types import PROJECTILE_TYPES
 from weapon.bullet_gun import BulletGun
 from weapon.laser_gun import LaserGun
+from weapon.cross_gun import CrossGun
 
 # 충돌 처리를 위한 group 분리
 npc_group = pygame.sprite.Group()
@@ -125,7 +126,9 @@ def main():
                 weapon.update_timer(clock.get_time())
                 if weapon.can_fire():
                     if isinstance(weapon, BulletGun):
-                        
+                        proj = weapon.fire(player, npc, projectile_sprites)
+                        projectiles.add(proj)
+                    if isinstance(weapon, CrossGun):
                         proj = weapon.fire(player, npc, projectile_sprites)
                         projectiles.add(proj)
                     elif isinstance(weapon, LaserGun):
@@ -144,7 +147,9 @@ def main():
                         dead = target.take_damage(proj.damage)
                         if dead:
                             player.exp += 50
-                    proj.kill()
+                        proj.pierce -= 1  # 관통 수 감소
+                        if proj.pierce < 0:
+                            proj.kill()
 
         # 플레이어 충돌 처리
         player_collisions = pygame.sprite.spritecollide(player, projectiles, False, pygame.sprite.collide_mask)
