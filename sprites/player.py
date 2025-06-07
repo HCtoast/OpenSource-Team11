@@ -3,6 +3,7 @@ from .spritesheet import SpriteSheet
 from weapon.bullet_gun import BulletGun
 from weapon.laser_gun import LaserGun
 from weapon.cross_gun import CrossGun
+from weapon.bomb_gun import BombGun
 
 class Player(pygame.sprite.Sprite):
     """
@@ -61,12 +62,16 @@ class Player(pygame.sprite.Sprite):
         laser_gun = LaserGun()
         laser_gun.acquired = False # 일단 False
 
-        cross = CrossGun(sprite_index=3)  # sprite index는 예시
-        cross.acquired = True
+        cross_gun = CrossGun(sprite_index=3)  # sprite index는 예시
+        cross_gun.acquired = True
 
-        self.weapons.append(cross)
+        bomb_gun = BombGun(sprite_index=4)
+        bomb_gun.acquired = True
+
+        self.weapons.append(cross_gun)
         self.weapons.append(bullet_gun)
         self.weapons.append(laser_gun)
+        self.weapons.append(bomb_gun)
 
     def update(self, keys):
         """
