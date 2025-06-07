@@ -11,6 +11,7 @@ from weapon.bullet_gun import BulletGun
 from weapon.laser_gun import LaserGun
 from weapon.cross_gun import CrossGun
 from weapon.bomb_gun import BombGun
+from map1_view import View_Map
 
 # 충돌 처리를 위한 group 분리
 npc_group = pygame.sprite.Group()
@@ -69,6 +70,9 @@ def main():
     player_projectile_type = PROJECTILE_TYPES["blue"]
     player_projectile_timer = 0
     player_projectile_cooldown = projectile_type["cooldown"]
+    #맵 객체생성
+    view_Map = View_Map("assets/map/map1.tmx")
+    # TMX 맵 초기화
 
     
     # 게임 루프
@@ -76,6 +80,10 @@ def main():
     clock = pygame.time.Clock()
     
     while running:
+                
+        # 화면 그리기
+        view_Map.draw_stretched_to_screen(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
+        
         # 이벤트 처리
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -171,10 +179,7 @@ def main():
             exp=player.exp,  # 실제 경험치 값 연결
             level=player.level  # 실제 레벨 값 연결
         )
-        
-        # 화면 그리기
-        screen.fill((30, 30, 30))
-    
+
         
         # 스프라이트 그리기
         screen.blit(player.image, player.rect)
