@@ -1,15 +1,16 @@
+from sprites.bomb_projectile import BombProjectile
 from .weapon import Weapon
-from sprites.cross_projectile import CrossProjectile
 
-class CrossGun(Weapon):
+class BombGun(Weapon):
     def __init__(self, sprite_index):
-        super().__init__("Cross Gun", base_damage=5, cooldown=600)
+        super().__init__("Bomb Gun", base_damage=30, cooldown=2400)
         self.sprite_index = sprite_index
-        self.projectilespeed = 4
-        self.acquired = False
+        self.projectilespeed = 3
+        self.acquired = False  # 기본은 미획득
 
     def fire(self, attacker, target, projectile_sprites):
-        return CrossProjectile(
+        radius = 100 + self.level * 20
+        proj = BombProjectile(
             x=attacker.rect.centerx,
             y=attacker.rect.centery,
             target_x=target.rect.centerx,
@@ -18,9 +19,9 @@ class CrossGun(Weapon):
             speed=self.projectilespeed,
             damage=self.calculate_damage(),
             owner=attacker,
-            max_distance=100 + self.level * 20  # 업그레이드에 따른 이동 거리 증가
+            radius=radius
         )
-    
+        return proj
+
     def upgradeweapon(self):
-        self.level += 1
-        # 업그레이드 로직 여기에 작성
+        pass

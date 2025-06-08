@@ -6,13 +6,18 @@ from sprites.player import Player
 from sprites.npc import NPC
 from sprites.projectile import Projectile, load_projectile_sprites
 from sprites.projectile_types import PROJECTILE_TYPES
+from sprites.bomb_projectile import BombProjectile
 from weapon.bullet_gun import BulletGun
 from weapon.laser_gun import LaserGun
 from weapon.cross_gun import CrossGun
+from weapon.bomb_gun import BombGun
 from map1_view import View_Map
+
 # 충돌 처리를 위한 group 분리
 npc_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
+
+BombProjectile.set_npc_group(npc_group)
 
 def main():
     
@@ -135,11 +140,14 @@ def main():
                     if isinstance(weapon, BulletGun):
                         proj = weapon.fire(player, npc, projectile_sprites)
                         projectiles.add(proj)
-                    if isinstance(weapon, CrossGun):
+                    elif isinstance(weapon, CrossGun):
                         proj = weapon.fire(player, npc, projectile_sprites)
                         projectiles.add(proj)
                     elif isinstance(weapon, LaserGun):
                         weapon.fire(player, npc_group)
+                    elif isinstance(weapon, BombGun):
+                        proj = weapon.fire(player, npc, projectile_sprites)
+                        projectiles.add(proj)
                         
 
         # 투사체 위치 업뎃
