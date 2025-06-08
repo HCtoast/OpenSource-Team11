@@ -1,3 +1,4 @@
+import os
 import pygame
 import sys
 from start_screen import StartScreen
@@ -9,7 +10,9 @@ from sprites.projectile_types import PROJECTILE_TYPES
 from weapon.bullet_gun import BulletGun
 from weapon.laser_gun import LaserGun
 from weapon.cross_gun import CrossGun
+
 from map1_view import View_Map
+
 # 충돌 처리를 위한 group 분리
 npc_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
@@ -40,8 +43,13 @@ def main():
     # 게임 UI 인스턴스 생성
     game_ui = GameUI(font)
     
+    # 마늘 무기 이미지 생성
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    image_path = os.path.join(base_path, "assets", "images", "garlic_aura.png")
+    garlic_image = pygame.image.load(image_path).convert_alpha()
+
     # 플레이어 및 NPC 생성
-    player = Player(SCREEN_WIDTH//2, SCREEN_HEIGHT//2)
+    player = Player(SCREEN_WIDTH//2, SCREEN_HEIGHT//2, garlic_image=garlic_image)
     player_group.add(player)
 
     npc = NPC(SCREEN_WIDTH//2 + 100, SCREEN_HEIGHT//2)
@@ -131,6 +139,10 @@ def main():
         for weapon in player.weapons:
             if weapon.acquired:
                 weapon.update_timer(clock.get_time())
+
+                if hasattr(weapon, 'aura'):
+                    weapon.update(clock.get_time(), npc_group)
+
                 if weapon.can_fire():
                     if isinstance(weapon, BulletGun):
                         proj = weapon.fire(player, npc, projectile_sprites)
@@ -138,7 +150,7 @@ def main():
                     if isinstance(weapon, CrossGun):
                         proj = weapon.fire(player, npc, projectile_sprites)
                         projectiles.add(proj)
-                    elif isinstance(weapon, LaserGun):
+                    if isinstance(weapon, LaserGun):
                         weapon.fire(player, npc_group)
                         
 
@@ -172,13 +184,19 @@ def main():
             level=player.level  # 실제 레벨 값 연결
         )
 
-        
-        # 스프라이트 그리기
+        # 마늘 무기 그리기
+        for weapon in player.weapons:
+            if weapon.acquired and hasattr(weapon, 'aura'):
+                screen.blit(weapon.aura.image, weapon.aura.rect)
+
+        # 플레이어 그리기
         screen.blit(player.image, player.rect)
+
         # npc가 kill 당해서 npc_group에서 빠지면 그리지 않음.
         for npc in npc_group:
             screen.blit(npc.image, npc.rect)
         
+        # 투사체
         projectiles.draw(screen)
         
         # UI 그리기

@@ -3,6 +3,7 @@ from .spritesheet import SpriteSheet
 from weapon.bullet_gun import BulletGun
 from weapon.laser_gun import LaserGun
 from weapon.cross_gun import CrossGun
+from weapon.garlic_aura import Garlic
 
 class Player(pygame.sprite.Sprite):
     """
@@ -10,7 +11,7 @@ class Player(pygame.sprite.Sprite):
     - x: 초기 X 좌표
     - y: 초기 Y 좌표
     """
-    def __init__(self, x, y):
+    def __init__(self, x, y, garlic_image):
         super().__init__()
 
         self.hp = 100      # 플레이어 체력
@@ -64,9 +65,13 @@ class Player(pygame.sprite.Sprite):
         cross = CrossGun(sprite_index=3)  # sprite index는 예시
         cross.acquired = True
 
+        garlic_aura = Garlic(player=self, image=garlic_image)
+        garlic_aura.acquired = True
+
         self.weapons.append(cross)
         self.weapons.append(bullet_gun)
         self.weapons.append(laser_gun)
+        self.weapons.append(garlic_aura)
 
     def update(self, keys):
         """
