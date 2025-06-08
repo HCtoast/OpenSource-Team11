@@ -191,7 +191,7 @@ def main():
                         projectiles.add(proj)
 
                     if isinstance(weapon, LaserGun):
-                        weapon.fire(player, npc_group)
+                        weapon.update(clock.get_time(), npc_group, player)
                       
 
         # 투사체 위치 업뎃
@@ -224,10 +224,12 @@ def main():
             level=player.level  # 실제 레벨 값 연결
         )
 
-        # 마늘 무기 그리기
+        # 마늘 및 레이저 무기 그리기
         for weapon in player.weapons:
             if weapon.acquired and hasattr(weapon, 'aura'):
                 screen.blit(weapon.aura.image, weapon.aura.rect)
+            if weapon.acquired and isinstance(weapon, LaserGun):
+                weapon.draw(screen, player)
 
         # 플레이어 그리기
         screen.blit(player.image, player.rect)
