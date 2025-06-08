@@ -7,6 +7,7 @@ class BulletGun(Weapon):
         self.sprite_index = 6
         self.projectilespeed = 6
         self.pierce = 0
+        self.acquired = False
 
     def fire(self, attacker, target, projectile_sprites):
         proj = Projectile(

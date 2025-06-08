@@ -8,6 +8,7 @@ class Garlic(Weapon):
         self.player = player
         self.radius = 200
         self.slow_factor = 0.5
+        self.acquired = False
 
         # 전달받은 image로 스케일 조정
         scale_factor = self.radius / image.get_width()

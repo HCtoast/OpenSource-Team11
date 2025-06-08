@@ -10,6 +10,8 @@ from sprites.projectile_types import PROJECTILE_TYPES
 from weapon.bullet_gun import BulletGun
 from weapon.laser_gun import LaserGun
 from weapon.cross_gun import CrossGun
+from weapon_select_screen import WeaponSelectScreen
+from weapon.garlic_aura import Garlic
 
 from map1_view import View_Map
 
@@ -40,6 +42,11 @@ def main():
         pygame.quit()
         sys.exit()
     
+    
+    # 무기 선택 화면 호출
+    weapon_selector = WeaponSelectScreen(screen, font)
+    selected_weapon_names = weapon_selector.select()
+    
     # 게임 UI 인스턴스 생성
     game_ui = GameUI(font)
     
@@ -51,6 +58,37 @@ def main():
     # 플레이어 및 NPC 생성
     player = Player(SCREEN_WIDTH//2, SCREEN_HEIGHT//2, garlic_image=garlic_image)
     player_group.add(player)
+    
+    
+    # 선택된 무기 장착
+    for name in selected_weapon_names:
+        if name == "Bullet Gun":
+            bullet_gun = BulletGun(sprite_index=6)
+            bullet_gun.acquired = True
+            player.weapons.append(bullet_gun)
+        elif name == "Laser":
+            laser_gun = LaserGun()
+            laser_gun.acquired = True
+            player.weapons.append(laser_gun)
+        elif name == "Cross Gun":
+            cross = CrossGun(sprite_index=7)
+            cross.acquired = True
+            player.weapons.append(cross)
+        elif name == "Garlic":
+            garlic_aura = Garlic(player=player, image=garlic_image)
+            garlic_aura.acquired = True
+            player.weapons.append(garlic_aura)
+        elif name == "Bomb":
+            pass  # 미구현
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     npc = NPC(SCREEN_WIDTH//2 + 100, SCREEN_HEIGHT//2)
     npc_group.add(npc)
@@ -147,12 +185,14 @@ def main():
                     if isinstance(weapon, BulletGun):
                         proj = weapon.fire(player, npc, projectile_sprites)
                         projectiles.add(proj)
+
                     if isinstance(weapon, CrossGun):
                         proj = weapon.fire(player, npc, projectile_sprites)
                         projectiles.add(proj)
+
                     if isinstance(weapon, LaserGun):
                         weapon.fire(player, npc_group)
-                        
+                      
 
         # 투사체 위치 업뎃
         projectiles.update(clock.get_time())
