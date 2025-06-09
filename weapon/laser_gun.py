@@ -17,7 +17,7 @@ class LaserGun(Weapon):
         # 현재 타겟 중 사거리 밖으로 나간 적 제거
         to_remove = set()
         for npc in self.targets:
-            if not self._within_range(attacker, npc):
+            if not npc.alive() or not self._within_range(attacker, npc):
                 to_remove.add(npc)
         self.targets -= to_remove
 
@@ -56,7 +56,7 @@ class LaserGun(Weapon):
         laser_color = (255, 200, 0, 153)  # 알파 153 ≈ 60% 투명도
 
         for npc in self.targets:
-            if hasattr(npc, "rect") and hasattr(attacker, "rect"):
+            if npc.alive():
                 start_pos = attacker.rect.center
                 end_pos = npc.rect.center
                 pygame.draw.line(laser_surface, laser_color, start_pos, end_pos, 3)
