@@ -14,18 +14,18 @@ from weapon.cross_gun import CrossGun
 from weapon_select_screen import WeaponSelectScreen
 from weapon.garlic_aura import Garlic
 from map1_view import View_Map
+from GameOverScreen import GameOverScreen
 from weapon.bomb_gun import BombGun
 from sprites.npc_spawner import NPCSpawner
 
 
-# 충돌 처리를 위한 group 분리
-npc_group = pygame.sprite.Group()
-player_group = pygame.sprite.Group()
-
-BombProjectile.set_npc_group(npc_group)
 
 def main():
-    
+    # 충돌 처리를 위한 group 분리
+    npc_group = pygame.sprite.Group()
+    player_group = pygame.sprite.Group()
+
+    BombProjectile.set_npc_group(npc_group)
     """메인 게임 함수"""
     # Pygame 초기화
     pygame.init()
@@ -131,7 +131,7 @@ def main():
     # 게임 루프
     running = True
     clock = pygame.time.Clock()
-    
+    start_time = pygame.time.get_ticks()  # 생존 시간 측정용
     while running:
                 
         # 화면 그리기
@@ -267,6 +267,16 @@ def main():
         
         pygame.display.flip()
         clock.tick(60)
+                # 게임 오버 조건 확인
+        if player.hp <= 0:
+            survival_time = (pygame.time.get_ticks() - start_time) / 1000  # ms → sec
+            gameover_screen = GameOverScreen(screen, "assets/images/Ending_Screen.png")
+            result = gameover_screen.show(survival_time)
+
+            if result == "reset":
+                main()  # 게임 재시작
+            else:
+                running = False
     
     pygame.quit()
     sys.exit()
