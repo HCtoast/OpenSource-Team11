@@ -4,6 +4,7 @@ from weapon.bullet_gun import BulletGun
 from weapon.laser_gun import LaserGun
 from weapon.cross_gun import CrossGun
 from weapon.garlic_aura import Garlic
+from weapon.bomb_gun import BombGun
 
 class Player(pygame.sprite.Sprite):
     """
@@ -55,8 +56,6 @@ class Player(pygame.sprite.Sprite):
 
         # 플레이어 무기 목록
         self.weapons = []
-
-
 
     def update(self, keys):
         """
