@@ -4,9 +4,10 @@ from .weapon import Weapon
 class BulletGun(Weapon):
     def __init__(self, sprite_index):
         super().__init__("Bullet Gun", base_damage=10, cooldown=400)
-        self.sprite_index = sprite_index
+        self.sprite_index = 6
         self.projectilespeed = 6
         self.pierce = 0
+        self.acquired = False
 
     def fire(self, attacker, target, projectile_sprites):
         proj = Projectile(
