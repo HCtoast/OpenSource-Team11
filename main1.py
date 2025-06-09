@@ -12,7 +12,7 @@ from weapon.laser_gun import LaserGun
 from weapon.cross_gun import CrossGun
 from weapon.bomb_gun import BombGun
 from map1_view import View_Map
-from npc_spawner import NPCSpawner
+from sprites.npc_spawner import NPCSpawner
 
 
 # 충돌 처리를 위한 group 분리
@@ -50,14 +50,15 @@ def main():
     # 플레이어 및 NPC 생성
     player = Player(SCREEN_WIDTH//2, SCREEN_HEIGHT//2)
     player_group.add(player)
-
-    spawner = NPCSpawner(player, npc_group, projectile_sprites)
     
     # 투사체 생성
     projectile_sprites = load_projectile_sprites("assets/images/projectiles.png")
 
     # 투사체 그룹 생성
     projectiles = pygame.sprite.Group()
+
+    # npc spawner 생성
+    spawner = NPCSpawner(player, npc_group, projectile_sprites)
     
     # (임시) 기본 투사체 설정(projectile_types 참조)
     projectile_type = PROJECTILE_TYPES["yellow"] # 투사체 색(특성) 가져오기
@@ -135,18 +136,24 @@ def main():
             if weapon.acquired:
                 weapon.update_timer(clock.get_time())
                 if weapon.can_fire():
-                    if isinstance(weapon, BulletGun):
-                        proj = weapon.fire(player, npc, projectile_sprites)
-                        projectiles.add(proj)
-                    elif isinstance(weapon, CrossGun):
-                        proj = weapon.fire(player, npc, projectile_sprites)
-                        projectiles.add(proj)
-                    elif isinstance(weapon, LaserGun):
+                    # 가장 가까운 npc 찾기
+                    if len(npc_group) > 0:
+                        closest_npc = min(
+                            npc_group,
+                            key=lambda n: (player.rect.centerx - n.rect.centerx)**2 + (player.rect.centery - n.rect.centery)**2)
+                        if isinstance(weapon, BulletGun):
+                            proj = weapon.fire(player, closest_npc, projectile_sprites)
+                            projectiles.add(proj)
+                        if isinstance(weapon, CrossGun):
+                            proj = weapon.fire(player, closest_npc, projectile_sprites)
+                            projectiles.add(proj)
+                        if isinstance(weapon, BombGun):
+                            proj = weapon.fire(player, closest_npc, projectile_sprites)
+                            projectiles.add(proj)
+                    else:
+                        closest_npc = None
+                    if isinstance(weapon, LaserGun):
                         weapon.fire(player, npc_group)
-                    elif isinstance(weapon, BombGun):
-                        proj = weapon.fire(player, npc, projectile_sprites)
-                        projectiles.add(proj)
-                        
 
         # 투사체 위치 업뎃
         projectiles.update(clock.get_time())
