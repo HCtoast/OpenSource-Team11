@@ -32,6 +32,8 @@ class NPC(pygame.sprite.Sprite):
         self.image = self.frames[self.current_state][self.current_frame]
         self.rect = self.image.get_rect(center=(x, y))
         self.health = 100
+        self.was_colliding = False
+        self.damage = 10
         
         # AI 관련 변수
         self.speed = 1

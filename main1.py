@@ -237,6 +237,18 @@ def main():
             if proj.owner != player:
                 player.take_damage(proj.damage)
                 proj.kill()
+
+        for npc in npc_group:
+            is_colliding = player.rect.colliderect(npc.rect)
+            was_colliding = npc.was_colliding
+
+            if is_colliding and not was_colliding:
+                print(f"{npc}와 충돌 시작")
+                player.take_damage(npc.damage)
+            elif not is_colliding and was_colliding:
+                print(f"{npc}와 충돌 종료")
+
+            npc.was_colliding = is_colliding
         
         # UI 업데이트 (예시 값 사용)
         game_ui.update(
