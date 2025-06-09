@@ -12,6 +12,9 @@ class WeaponSelectScreen:
         self.current_index = 0
         self.max_select = 3
         self.weapon_images = self.load_weapon_images()
+        self.background = pygame.image.load("assets//images//Weapon_Select_Background.png").convert()
+        self.background = pygame.transform.scale(self.background, (800,600))
+
 
     def load_weapon_images(self):
         images = {}
@@ -24,8 +27,8 @@ class WeaponSelectScreen:
         return images
 
     def draw(self):
-        
-        self.screen.fill((10, 10, 10))
+        self.screen.blit(self.background, (0, 0))
+        #self.screen.fill((10, 10, 10))
         title = self.title_font.render("Select 3 Weapons", True, (255, 230, 100))  # 노란 계열
         self.screen.blit(title, ((self.screen.get_width() - title.get_width()) // 2, 30))
 
