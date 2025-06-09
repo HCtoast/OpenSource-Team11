@@ -31,6 +31,9 @@ class NPC(pygame.sprite.Sprite):
         self.current_frame = 0
         self.image = self.frames[self.current_state][self.current_frame]
         self.rect = self.image.get_rect(center=(x, y))
+        self.health = 100
+        self.was_colliding = False
+        self.damage = 10
         
         # AI 관련 변수
         self.speed = 1
@@ -43,6 +46,9 @@ class NPC(pygame.sprite.Sprite):
         # 애니메이션 타이밍 설정
         self.animation_speed = 200  # NPC는 더 느린 애니메이션
         self.last_update = pygame.time.get_ticks()
+
+        self.projectile_timer = 0
+        self.projectile_cooldown = 800  # Projectile_type 에서 가져오는게 아닌, 임시로 800 할당.
         
         print(f"NPC 생성 완료 - 위치: ({x}, {y})")
 
@@ -104,3 +110,14 @@ class NPC(pygame.sprite.Sprite):
             if self.current_state in self.frames and self.frames[self.current_state]:
                 self.current_frame = (self.current_frame + 1) % len(self.frames[self.current_state])
                 self.image = self.frames[self.current_state][self.current_frame]
+    
+    def take_damage(self, amount,player):
+        self.health -= amount
+        if self.health <= 0:
+            player.exp +=25
+            self.kill()
+            return True
+        return False
+    
+    def apply_slow(self, factor):
+        pass

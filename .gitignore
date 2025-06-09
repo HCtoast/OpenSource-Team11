@@ -1,0 +1,7 @@
+# Python bytecode 캐시
+__pycache__/
+*.py[cod]
+*$py.class
+
+# VSCode 설정
+.vscode/

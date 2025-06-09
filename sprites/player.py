@@ -1,5 +1,10 @@
 import pygame
 from .spritesheet import SpriteSheet
+from weapon.bullet_gun import BulletGun
+from weapon.laser_gun import LaserGun
+from weapon.cross_gun import CrossGun
+from weapon.garlic_aura import Garlic
+from weapon.bomb_gun import BombGun
 
 class Player(pygame.sprite.Sprite):
     """
@@ -7,7 +12,7 @@ class Player(pygame.sprite.Sprite):
     - x: 초기 X 좌표
     - y: 초기 Y 좌표
     """
-    def __init__(self, x, y):
+    def __init__(self, x, y, garlic_image):
         super().__init__()
 
         self.hp = 100      # 플레이어 체력
@@ -34,7 +39,10 @@ class Player(pygame.sprite.Sprite):
         self.current_frame = 0
         self.image = self.frames[self.current_state][self.current_frame]
         self.rect = self.image.get_rect(center=(x, y))
-        
+
+        # 충돌 판정을 위한 mask 정의
+        self.mask = pygame.mask.from_surface(self.image)
+
         # 이동 관련 변수
         self.speed = 3
         self.direction = 'down'  # 현재 바라보는 방향
@@ -45,6 +53,9 @@ class Player(pygame.sprite.Sprite):
         self.last_update = pygame.time.get_ticks()
         
         print("플레이어 생성 완료")
+
+        # 플레이어 무기 목록
+        self.weapons = []
 
     def update(self, keys):
         """
@@ -106,3 +117,8 @@ class Player(pygame.sprite.Sprite):
             if self.current_state in self.frames and self.frames[self.current_state]:
                 self.current_frame = (self.current_frame + 1) % len(self.frames[self.current_state])
                 self.image = self.frames[self.current_state][self.current_frame]
+    
+    def take_damage(self, amount):
+            self.hp -= amount
+            if self.hp <= 0:
+                self.kill()
