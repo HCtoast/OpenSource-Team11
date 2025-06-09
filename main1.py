@@ -77,7 +77,7 @@ def main():
             bullet_gun.acquired = True
             player.weapons.append(bullet_gun)
         elif name == "Laser":
-            laser_gun = LaserGun()
+            laser_gun = LaserGun(player)
             laser_gun.acquired = True
             player.weapons.append(laser_gun)
         elif name == "Cross Gun":
@@ -245,8 +245,8 @@ def main():
                 if proj.owner != target:
                     if hasattr(target, 'take_damage'):
                         dead = target.take_damage(proj.damage)
-                        if dead:
-                            player.exp += 50
+                        #if dead:
+                            #player.exp += 50
                         proj.pierce -= 1  # 관통 수 감소
                         if proj.pierce < 0:
                             proj.kill()

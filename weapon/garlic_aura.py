@@ -41,7 +41,7 @@ class Garlic(Weapon):
                 offset = (npc.rect.left - self.aura.rect.left, npc.rect.top - self.aura.rect.top)
                 if self.aura.mask.overlap(pygame.mask.from_surface(npc.image), offset):
                     if hasattr(npc, "take_damage"):
-                        npc.take_damage(self.base_damage)
+                        npc.take_damage(self.base_damage, self.player)
                     if hasattr(npc, "apply_slow"):
                         npc.apply_slow(self.slow_factor)
 
