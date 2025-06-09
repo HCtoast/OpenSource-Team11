@@ -27,5 +27,5 @@ class BulletGun(Weapon):
         self.level += 1
         self.base_damage += 1
         self.projectilespeed += 1
-        self.cooldown = self.cooldown*0.92
+        self.cooldown -= 100 
         self.pierce = self.level - 1
