@@ -24,4 +24,4 @@ class BombGun(Weapon):
         return proj
 
     def upgradeweapon(self):
-        pass
+        self.cooldown = self.cooldonw*0.95
