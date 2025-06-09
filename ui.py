@@ -10,17 +10,19 @@ class GameUI:
         self.current_exp = 0
         self.level = 1
         self.start_time = time.time()
-
-    def update(self, hp, exp, level):
+        self.paused = False
+        
+    def update(self, hp, exp, level, paused):
         self.current_hp = hp
         self.current_exp = exp
         self.level = level
+        self.paused = paused
 
     def draw_bar(self, surface, x, y, w, h, ratio, color_bg, color_fg):
         pygame.draw.rect(surface, color_bg, (x, y, w, h))
         pygame.draw.rect(surface, color_fg, (x, y, int(w * ratio), h))
 
-    def draw(self, surface):
+    def draw(self, surface, paused_surface):
         # 체력 바
         self.draw_bar(surface, 20, 20, 200, 20, self.current_hp / self.max_hp, (100, 0, 0), (255, 0, 0))
         hp_text = self.font.render("HP", True, (255, 255, 255))
@@ -38,3 +40,13 @@ class GameUI:
         mins, secs = divmod(elapsed, 60)
         time_text = self.font.render(f"Time: {mins:02}:{secs:02}", True, (255, 255, 255))
         surface.blit(time_text, (20, 100))
+        
+        if self.paused:
+            paused_surface.fill((0, 0, 0, 150))
+
+            p1 = self.font.render("PAUSED", True, (255, 255, 255))
+            paused_surface.blit(p1, (280, 20))
+            p1 = self.font.render("Press [Enter] key to escape !", True, (255, 30, 30))
+            paused_surface.blit(p1, (170, 230))
+            
+            surface.blit(paused_surface, (80, 60))
