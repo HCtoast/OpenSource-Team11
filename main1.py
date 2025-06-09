@@ -12,6 +12,8 @@ from weapon.laser_gun import LaserGun
 from weapon.cross_gun import CrossGun
 from weapon.bomb_gun import BombGun
 from map1_view import View_Map
+from npc_spawner import NPCSpawner
+
 
 # 충돌 처리를 위한 group 분리
 npc_group = pygame.sprite.Group()
@@ -49,11 +51,7 @@ def main():
     player = Player(SCREEN_WIDTH//2, SCREEN_HEIGHT//2)
     player_group.add(player)
 
-    npc = NPC(SCREEN_WIDTH//2 + 100, SCREEN_HEIGHT//2)
-    npc_group.add(npc)
-    for i in range(3):  # 3마리 추가 생성
-        npc = NPC(200 + i * 200, 200)
-        npc_group.add(npc)
+    spawner = NPCSpawner(player, npc_group, projectile_sprites)
     
     # 투사체 생성
     projectile_sprites = load_projectile_sprites("assets/images/projectiles.png")
@@ -101,7 +99,7 @@ def main():
             player.exp = 0    
             player.level +=1
         
-        
+        spawner.update(clock.get_time())
         
         for npc in npc_group:
             npc.update()
