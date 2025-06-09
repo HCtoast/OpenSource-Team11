@@ -131,6 +131,7 @@ def main():
     # 게임 루프
     running = True
     clock = pygame.time.Clock()
+    dt = clock.tick(60) / 1000  # Limit FPS to 60
     start_time = pygame.time.get_ticks()  # 생존 시간 측정용
     while running:
                 
@@ -224,9 +225,9 @@ def main():
             for proj in hit_projectiles:
                 if proj.owner != target:
                     if hasattr(target, 'take_damage'):
-                        dead = target.take_damage(proj.damage,player)
-                        #if dead:
-                            #player.exp += 50
+                        dead = target.take_damage(proj.damage)
+                        if dead:
+                            player.exp += 50
                         proj.pierce -= 1  # 관통 수 감소
                         if proj.pierce < 0:
                             proj.kill()
@@ -271,7 +272,7 @@ def main():
         if player.hp <= 0:
             survival_time = (pygame.time.get_ticks() - start_time) / 1000  # ms → sec
             gameover_screen = GameOverScreen(screen, "assets/images/Ending_Screen.png")
-            result = gameover_screen.show(survival_time)
+            result = gameover_screen.wait_for_choice()
 
             if result == "reset":
                 main()  # 게임 재시작
@@ -289,3 +290,12 @@ if __name__ == "__main__":
         import traceback
         traceback.print_exc()  # 오류 전체 출력
         input("오류가 발생했습니다. Enter를 눌러 종료합니다...")
+
+        # Clear screen
+        screen.fill((0, 0, 0))
+        map_view.draw(screen)
+        npc_group.draw(screen)
+        player_group.draw(screen)
+        projectile_group.draw(screen)
+        ui.draw(screen)
+        pygame.display.flip()
