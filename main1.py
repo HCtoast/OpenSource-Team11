@@ -24,6 +24,9 @@ player_group = pygame.sprite.Group()
 
 BombProjectile.set_npc_group(npc_group)
 
+# Pause -> Enter키눌러서 게임 재시작시 게임 재시작 세팅 여부 (boolean)
+gameRestart = False
+
 def main():
     
     """메인 게임 함수"""
@@ -148,6 +151,10 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     game_paused = not game_paused
+                if event.key == pygame.K_RETURN and game_paused:
+                    gameRestart = True
+                    pygame.quit()
+                    return gameRestart
         
         # 게임 상태 업데이트
         keys = pygame.key.get_pressed()
@@ -283,7 +290,13 @@ def main():
 # 디버깅용 try 처리
 if __name__ == "__main__":
     try:
-        main()
+        while True:
+            gameRestart = main()
+            
+            if(not gameRestart):
+                break
+
+            gameRestart = False
     except Exception as e:
         import traceback
         traceback.print_exc()  # 오류 전체 출력
