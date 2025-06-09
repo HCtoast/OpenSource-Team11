@@ -1,7 +1,7 @@
 # Survival Game - Team 11
 
 > Python + Pygame 기반의 생존 액션 게임  
-> 무기를 선택하고 자동 공격으로 적을 처치하며 **5분 동안 생존**하는 것이 목표입니다.
+> 무기를 선택하고 자동 공격으로 적을 처치하며 **최대한 오래 생존**하는 것이 목표입니다.
 
 ---
 
@@ -37,16 +37,24 @@
 
 ```
 OpenSource-Team11-feature4/
-├── main1.py                  # 메인 게임 루프 및 화면 처리
+├── main1.py                 # 메인 게임 루프 및 화면 처리
 ├── start_screen.py          # 시작화면 UI
 ├── weapon_select_screen.py  # 무기 선택 화면
 ├── ui.py                    # 체력/경험치/레벨/시간 UI
+├── GameOverScreen.py:       # 종료화면 UI 
+├── map1_view.py             # 맵 그리기
 ├── sprites/
 │   ├── player.py            # 플레이어 클래스
 │   ├── npc.py               # 적 캐릭터 클래스
+│   ├── npc_spawner.py       # 적 소환 클래스
+│   ├── spritesheet.py       # player, npc 이미지 추출
 │   ├── projectile.py        # 발사체 로직
+│   ├── navmesh_agent.py     # 적 추격 알고리즘
+│   ├── navmesh_testcode.py  # NavMeshAgent 시각화
+│   ├── bomb_proejctile.py   # 폭발형 범위 무기 로직
 │   └── cross_projectile.py  # 교차형 범위 무기 로직
 ├── weapon/                  # 무기 폴더
+│   ├── bullet_gun.py, cross_gun.py, laser_gun.py, bomb_gun.py, garlic_aura.py 무기 5종 클래스
 ├── assets/
 │   ├── images/              # 캐릭터 및 무기 스프라이트
 │   └── map/                 # Tiled 맵(.tmx) 및 타일셋
@@ -60,6 +68,7 @@ pip install pygame pytmx
 ```
 
 ### 2. 게임 실행
+main1.py 있는 폴더의 bash 에서
 ```bash
 python main1.py
 ```
