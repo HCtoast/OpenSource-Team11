@@ -46,7 +46,7 @@ class GameUI:
 
             p1 = self.font.render("PAUSED", True, (255, 255, 255))
             paused_surface.blit(p1, (280, 20))
-            p1 = self.font.render("Press [Enter] to escape !", True, (255, 30, 30))
+            p1 = self.font.render("Press [Enter] key to escape !", True, (255, 30, 30))
             paused_surface.blit(p1, (170, 230))
             
             surface.blit(paused_surface, (80, 60))
