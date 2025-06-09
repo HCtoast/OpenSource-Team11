@@ -3,13 +3,14 @@ import pygame
 import math
 
 class LaserGun(Weapon):
-    def __init__(self):
+    def __init__(self, player):
         super().__init__("Laser Gun", base_damage=8, cooldown=300)
         self.timer = 0
         self.range = 250  # 기본 사거리
         self.max_targets = 2  # 타겟 수 (레벨 1)
         self.targets = set()  # 현재 타겟팅된 적
         self.acquired = False
+        self.player = player
 
     def update(self, dt, npc_group, attacker):
         self.timer += dt
@@ -35,7 +36,7 @@ class LaserGun(Weapon):
         if self.timer >= self.cooldown:
             for npc in self.targets:
                 if hasattr(npc, "take_damage"):
-                    npc.take_damage(self.calculate_damage())
+                    npc.take_damage(self.calculate_damage(), self.player)
             self.timer = 0
 
     def _within_range(self, attacker, npc):
