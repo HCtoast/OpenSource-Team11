@@ -244,7 +244,7 @@ def main():
             for proj in hit_projectiles:
                 if proj.owner != target:
                     if hasattr(target, 'take_damage'):
-                        dead = target.take_damage(proj.damage)
+                        dead = target.take_damage(proj.damage, player)
                         #if dead:
                             #player.exp += 50
                         proj.pierce -= 1  # 관통 수 감소
