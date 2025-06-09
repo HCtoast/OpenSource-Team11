@@ -7,6 +7,7 @@ from sprites.player import Player
 from sprites.npc import NPC
 from sprites.projectile import Projectile, load_projectile_sprites
 from sprites.projectile_types import PROJECTILE_TYPES
+
 from sprites.bomb_projectile import BombProjectile
 from weapon.bullet_gun import BulletGun
 from weapon.laser_gun import LaserGun
@@ -17,7 +18,7 @@ from map1_view import View_Map
 from GameOverScreen import GameOverScreen
 from weapon.bomb_gun import BombGun
 from sprites.npc_spawner import NPCSpawner
-
+from sprites.navmesh_animator import NavMeshAnimator
 
 
 # Pause -> Enter키눌러서 게임 재시작시 게임 재시작 세팅 여부 (boolean)
@@ -120,6 +121,10 @@ def main():
     #맵 객체생성
     view_Map = View_Map("assets/map/map1.tmx")
     # TMX 맵 초기화
+    
+    # 적 추격 알고리즘 생성
+    animator = NavMeshAnimator(32, SCREEN_WIDTH, SCREEN_HEIGHT)
+    animator.SetPosition(npc.rect.x, npc.rect.y)
 
     # 반투명 Surface 추가
     paused_image = pygame.Surface((SCREEN_WIDTH - SCREEN_WIDTH / 5, SCREEN_HEIGHT - SCREEN_HEIGHT / 5), pygame.SRCALPHA)
@@ -130,7 +135,9 @@ def main():
     clock = pygame.time.Clock()
     start_time = pygame.time.get_ticks()  # 생존 시간 측정용
     while running:
-                
+        # 델타 타임
+        dt = clock.tick(60) / 1000.0
+    
         # 화면 그리기
         view_Map.draw_stretched_to_screen(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
         
@@ -164,6 +171,13 @@ def main():
             
             for npc in npc_group:
                 npc.update()
+                
+        # AI 적추격 알고리즘 결과값을 npc 위치정보에 이식
+        #animator.SetTargetPosition(player.rect.x, player.rect.y)
+        #animator.SetPosition(npc.rect.x, npc.rect.y)
+        #x, y = animator.update(dt)
+        #npc.rect.x = x
+        #npc.rect.y = y
 
                 # npc 마다 개별적용.
                 # 투사체 쿨다운 타이머 증가

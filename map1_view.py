@@ -32,6 +32,7 @@ class View_Map:
         scaled_surface = pygame.transform.scale(sub_surface, (screen_width, screen_height))
         # 화면에 출력
         screen.blit(scaled_surface, (0, 0))
+        
     def draw_fullscreen_scaled(self, screen, screen_width, screen_height):
         # 맵 전체를 화면에 맞게 축소 비율로 스케일
         scale_x = screen_width / self.map_width
@@ -49,6 +50,6 @@ class View_Map:
         # 맵을 화면 크기에 강제로 맞춤 (비율 무시, 왜곡 허용)
         stretched_surface = pygame.transform.scale(self.map_surface, (screen_width, screen_height))
         screen.blit(stretched_surface, (0, 0))
-
+        
     
         
