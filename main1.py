@@ -14,21 +14,21 @@ from weapon.cross_gun import CrossGun
 from weapon_select_screen import WeaponSelectScreen
 from weapon.garlic_aura import Garlic
 from map1_view import View_Map
+from GameOverScreen import GameOverScreen
 from weapon.bomb_gun import BombGun
 from sprites.npc_spawner import NPCSpawner
 
 
-# 충돌 처리를 위한 group 분리
-npc_group = pygame.sprite.Group()
-player_group = pygame.sprite.Group()
-
-BombProjectile.set_npc_group(npc_group)
 
 # Pause -> Enter키눌러서 게임 재시작시 게임 재시작 세팅 여부 (boolean)
 gameRestart = False
 
 def main():
-    
+    # 충돌 처리를 위한 group 분리
+    npc_group = pygame.sprite.Group()
+    player_group = pygame.sprite.Group()
+
+    BombProjectile.set_npc_group(npc_group)
     """메인 게임 함수"""
     # Pygame 초기화
     pygame.init()
@@ -91,16 +91,7 @@ def main():
             Bomb = BombGun(sprite_index=8)
             Bomb.acquired = True
             player.weapons.append(Bomb)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
+            
     npc = NPC(SCREEN_WIDTH//2 + 100, SCREEN_HEIGHT//2)
     npc_group.add(npc)
     for i in range(3):  # 3마리 추가 생성
@@ -137,7 +128,7 @@ def main():
     running = True
     game_paused = False
     clock = pygame.time.Clock()
-    
+    start_time = pygame.time.get_ticks()  # 생존 시간 측정용
     while running:
                 
         # 화면 그리기
@@ -233,25 +224,37 @@ def main():
             # 투사체 위치 업뎃
             projectiles.update(clock.get_time())
 
-            # NPC 충돌 처리
-            collisions = pygame.sprite.groupcollide(npc_group, projectiles, False, False)
-            for target, hit_projectiles in collisions.items():
-                for proj in hit_projectiles:
-                    if proj.owner != target:
-                        if hasattr(target, 'take_damage'):
-                            dead = target.take_damage(proj.damage)
-                            if dead:
-                                player.exp += 50
-                            proj.pierce -= 1  # 관통 수 감소
-                            if proj.pierce < 0:
-                                proj.kill()
+        # NPC 충돌 처리
+        collisions = pygame.sprite.groupcollide(npc_group, projectiles, False, False)
+        for target, hit_projectiles in collisions.items():
+            for proj in hit_projectiles:
+                if proj.owner != target:
+                    if hasattr(target, 'take_damage'):
+                        dead = target.take_damage(proj.damage,player)
+                        #if dead:
+                            #player.exp += 50
+                        proj.pierce -= 1  # 관통 수 감소
+                        if proj.pierce < 0:
+                            proj.kill()
 
-            # 플레이어 충돌 처리
-            player_collisions = pygame.sprite.spritecollide(player, projectiles, False, pygame.sprite.collide_mask)
-            for proj in player_collisions:
-                if proj.owner != player:
-                    player.take_damage(proj.damage)
-                    proj.kill()
+        # 플레이어 충돌 처리
+        player_collisions = pygame.sprite.spritecollide(player, projectiles, False, pygame.sprite.collide_mask)
+        for proj in player_collisions:
+            if proj.owner != player:
+                player.take_damage(proj.damage)
+                proj.kill()
+
+        for npc in npc_group:
+            is_colliding = player.rect.colliderect(npc.rect)
+            was_colliding = npc.was_colliding
+
+            if is_colliding and not was_colliding:
+                print(f"{npc}와 충돌 시작")
+                player.take_damage(npc.damage)
+            elif not is_colliding and was_colliding:
+                print(f"{npc}와 충돌 종료")
+
+            npc.was_colliding = is_colliding
             
         # UI 업데이트 (예시 값 사용)
         game_ui.update(
@@ -283,6 +286,16 @@ def main():
         
         pygame.display.flip()
         clock.tick(60)
+                # 게임 오버 조건 확인
+        if player.hp <= 0:
+            survival_time = (pygame.time.get_ticks() - start_time) / 1000  # ms → sec
+            gameover_screen = GameOverScreen(screen, "assets/images/Ending_Screen.png")
+            result = gameover_screen.show(survival_time)
+
+            if result == "reset":
+                main()  # 게임 재시작
+            else:
+                running = False
     
     pygame.quit()
     sys.exit()
