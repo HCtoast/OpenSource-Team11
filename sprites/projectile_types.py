@@ -19,13 +19,13 @@ PROJECTILE_TYPES = {
         "index": 2,
         "speed": 5,
         "cooldown": 800,
-        "damage": 3,
+        "damage": 30,
     },
     "green": {
         "index": 3,
         "speed": 5,
-        "cooldown": 800,
-        "damage": 4,
+        "cooldown": 3200,
+        "damage": 30,
     },
     "purple": {
         "index": 4,
@@ -39,4 +39,24 @@ PROJECTILE_TYPES = {
         "cooldown": 800,
         "damage": 6,
     },
+        "dagger": {
+        "index": 6,
+        "speed": 5,
+        "cooldown": 600,
+        "damage": 6,
+    },
+       "cross": {
+        "index": 7,
+        "speed": 5,
+        "cooldown": 600,
+        "damage": 6,
+    },
+       "bomb": {
+        "index": 8,
+        "speed": 5,
+        "cooldown": 600,
+        "damage": 6,
+    },
+    
+    
 }

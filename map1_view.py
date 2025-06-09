@@ -32,5 +32,23 @@ class View_Map:
         scaled_surface = pygame.transform.scale(sub_surface, (screen_width, screen_height))
         # 화면에 출력
         screen.blit(scaled_surface, (0, 0))
+    def draw_fullscreen_scaled(self, screen, screen_width, screen_height):
+        # 맵 전체를 화면에 맞게 축소 비율로 스케일
+        scale_x = screen_width / self.map_width
+        scale_y = screen_height / self.map_height
+        zoom = min(scale_x, scale_y)
+
+        # 맵 전체를 스케일해서 새 surface로 그림
+        scaled_surface = pygame.transform.smoothscale(self.map_surface, (int(self.map_width * zoom), int(self.map_height * zoom)))
+
+        # 화면 가운데에 맵 배경을 위치시킴 (여백이 있다면 중앙정렬)
+        pos_x = (screen_width - scaled_surface.get_width()) // 2
+        pos_y = (screen_height - scaled_surface.get_height()) // 2
+        screen.blit(scaled_surface, (pos_x, pos_y))
+    def draw_stretched_to_screen(self, screen, screen_width, screen_height):
+        # 맵을 화면 크기에 강제로 맞춤 (비율 무시, 왜곡 허용)
+        stretched_surface = pygame.transform.scale(self.map_surface, (screen_width, screen_height))
+        screen.blit(stretched_surface, (0, 0))
+
     
         
