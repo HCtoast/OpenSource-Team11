@@ -20,6 +20,9 @@ from sprites.npc_spawner import NPCSpawner
 
 
 
+# Pause -> Enter키눌러서 게임 재시작시 게임 재시작 세팅 여부 (boolean)
+gameRestart = False
+
 def main():
     # 충돌 처리를 위한 group 분리
     npc_group = pygame.sprite.Group()
@@ -88,16 +91,7 @@ def main():
             Bomb = BombGun(sprite_index=8)
             Bomb.acquired = True
             player.weapons.append(Bomb)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
+            
     npc = NPC(SCREEN_WIDTH//2 + 100, SCREEN_HEIGHT//2)
     npc_group.add(npc)
     for i in range(3):  # 3마리 추가 생성
@@ -127,9 +121,12 @@ def main():
     view_Map = View_Map("assets/map/map1.tmx")
     # TMX 맵 초기화
 
+    # 반투명 Surface 추가
+    paused_image = pygame.Surface((SCREEN_WIDTH - SCREEN_WIDTH / 5, SCREEN_HEIGHT - SCREEN_HEIGHT / 5), pygame.SRCALPHA)
     
     # 게임 루프
     running = True
+    game_paused = False
     clock = pygame.time.Clock()
     start_time = pygame.time.get_ticks()  # 생존 시간 측정용
     while running:
@@ -141,82 +138,91 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game_paused = not game_paused
+                if event.key == pygame.K_RETURN and game_paused:
+                    gameRestart = True
+                    pygame.quit()
+                    return gameRestart
         
         # 게임 상태 업데이트
         keys = pygame.key.get_pressed()
-        player.update(keys)
         
-        
-        # 플레이어 경험치 
-        if player.exp >= 100: 
-            for weapon in player.weapons:
-                weapon.upgradeweapon()
-            player.exp = 0    
-            player.level +=1
-        
-        spawner.update(clock.get_time())
-        
-        for npc in npc_group:
-            npc.update()
-
-            # npc 마다 개별적용.
-            # 투사체 쿨다운 타이머 증가
-            npc.projectile_timer += clock.get_time()
+        if not game_paused:
+            player.update(keys)
             
-            # 쿨타임을 넘어서면 0으로 타이머 리셋시킴
-            if npc.projectile_timer >= npc.projectile_cooldown:
-                npc.projectile_timer = 0  # 타이머 리셋
+            # 플레이어 경험치 
+            if player.exp >= 100: 
+                for weapon in player.weapons:
+                    weapon.upgradeweapon()
+                player.exp = 0    
+                player.level +=1
+            
+            spawner.update(clock.get_time())
+            
+            for npc in npc_group:
+                npc.update()
 
-        # 현재 projectile_type에서 속성 추출
-                index = projectile_type["index"]
-                speed = projectile_type["speed"]
-                damage = projectile_type["damage"]
+                # npc 마다 개별적용.
+                # 투사체 쿨다운 타이머 증가
+                npc.projectile_timer += clock.get_time()
+                
+                # 쿨타임을 넘어서면 0으로 타이머 리셋시킴
+                if npc.projectile_timer >= npc.projectile_cooldown:
+                    npc.projectile_timer = 0  # 타이머 리셋
 
-                # type에 맞는 속성 적용한 투사체 만들기
-                proj = Projectile( 
-                    # 플레이어 위치와 NPC 위치를 참조(둘 다 중앙에서 시작)하여 속도를 정함
-                    npc.rect.centerx, npc.rect.centery,
-                    player.rect.centerx, player.rect.centery,
-                    projectile_sprites[index],
-                    speed=speed,
-                    damage=damage,
-                    owner=npc
-                )
-                # 투사체 group에 추가(화면 벗어나면 삭제됨)
-                projectiles.add(proj)
-        
-        # 무기
-        for weapon in player.weapons:
-            if weapon.acquired:
-                weapon.update_timer(clock.get_time())
+            # 현재 projectile_type에서 속성 추출
+                    index = projectile_type["index"]
+                    speed = projectile_type["speed"]
+                    damage = projectile_type["damage"]
 
-                if hasattr(weapon, 'aura'):
-                    weapon.update(clock.get_time(), npc_group)
+                    # type에 맞는 속성 적용한 투사체 만들기
+                    proj = Projectile( 
+                        # 플레이어 위치와 NPC 위치를 참조(둘 다 중앙에서 시작)하여 속도를 정함
+                        npc.rect.centerx, npc.rect.centery,
+                        player.rect.centerx, player.rect.centery,
+                        projectile_sprites[index],
+                        speed=speed,
+                        damage=damage,
+                        owner=npc
+                    )
+                    # 투사체 group에 추가(화면 벗어나면 삭제됨)
+                    projectiles.add(proj)
+            
+            # 무기
+            for weapon in player.weapons:
+                if weapon.acquired:
+                    weapon.update_timer(clock.get_time())
 
-                if weapon.can_fire():
+                    if hasattr(weapon, 'aura'):
+                        weapon.update(clock.get_time(), npc_group)
 
-                    # 가장 가까운 npc 찾기
-                    if len(npc_group) > 0:
-                        closest_npc = min(
-                            npc_group,
-                            key=lambda n: (player.rect.centerx - n.rect.centerx)**2 + (player.rect.centery - n.rect.centery)**2)
-                        if isinstance(weapon, BulletGun):
-                            proj = weapon.fire(player, closest_npc, projectile_sprites)
-                            projectiles.add(proj)
-                        if isinstance(weapon, CrossGun):
-                            proj = weapon.fire(player, closest_npc, projectile_sprites)
-                            projectiles.add(proj)
-                        if isinstance(weapon, BombGun):
-                            proj = weapon.fire(player, closest_npc, projectile_sprites)
-                            projectiles.add(proj)
-                    else:
-                        closest_npc = None
-                    if isinstance(weapon, LaserGun):
-                        weapon.update(clock.get_time(), npc_group, player)
-                        #weapon.fire(player, npc_group,projectile_sprites)
+                    if weapon.can_fire():
 
-        # 투사체 위치 업뎃
-        projectiles.update(clock.get_time())
+                        # 가장 가까운 npc 찾기
+                        if len(npc_group) > 0:
+                            closest_npc = min(
+                                npc_group,
+                                key=lambda n: (player.rect.centerx - n.rect.centerx)**2 + (player.rect.centery - n.rect.centery)**2)
+                            if isinstance(weapon, BulletGun):
+                                proj = weapon.fire(player, closest_npc, projectile_sprites)
+                                projectiles.add(proj)
+                            if isinstance(weapon, CrossGun):
+                                proj = weapon.fire(player, closest_npc, projectile_sprites)
+                                projectiles.add(proj)
+                            if isinstance(weapon, BombGun):
+                                proj = weapon.fire(player, closest_npc, projectile_sprites)
+                                projectiles.add(proj)
+                        else:
+                            closest_npc = None
+                        if isinstance(weapon, LaserGun):
+                            weapon.update(clock.get_time(), npc_group, player)
+                            #weapon.fire(player, npc_group,projectile_sprites)
+
+            # 투사체 위치 업뎃
+            projectiles.update(clock.get_time())
 
         # NPC 충돌 처리
         collisions = pygame.sprite.groupcollide(npc_group, projectiles, False, False)
@@ -249,12 +255,13 @@ def main():
                 print(f"{npc}와 충돌 종료")
 
             npc.was_colliding = is_colliding
-        
+            
         # UI 업데이트 (예시 값 사용)
         game_ui.update(
             hp=player.hp,  # 실제 HP 값 연결
             exp=player.exp,  # 실제 경험치 값 연결
-            level=player.level  # 실제 레벨 값 연결
+            level=player.level,  # 실제 레벨 값 연결
+            paused=game_paused
         )
 
         # 마늘 및 레이저 무기 그리기
@@ -275,7 +282,7 @@ def main():
         projectiles.draw(screen)
         
         # UI 그리기
-        game_ui.draw(screen)
+        game_ui.draw(screen, paused_image)
         
         pygame.display.flip()
         clock.tick(60)
@@ -296,7 +303,13 @@ def main():
 # 디버깅용 try 처리
 if __name__ == "__main__":
     try:
-        main()
+        while True:
+            gameRestart = main()
+            
+            if(not gameRestart):
+                break
+
+            gameRestart = False
     except Exception as e:
         import traceback
         traceback.print_exc()  # 오류 전체 출력
