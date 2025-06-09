@@ -4,6 +4,7 @@ from sprites.cross_projectile import CrossProjectile
 class CrossGun(Weapon):
     def __init__(self, sprite_index):
         super().__init__("Cross Gun", base_damage=5, cooldown=600)
+        self.sprite_index = 7
         self.sprite_index = sprite_index
         self.projectilespeed = 4
         self.acquired = False

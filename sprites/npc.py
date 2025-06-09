@@ -115,3 +115,6 @@ class NPC(pygame.sprite.Sprite):
             self.kill()
             return True
         return False
+    
+    def apply_slow(self, factor):
+        pass

@@ -1,3 +1,4 @@
+import os
 import pygame
 import sys
 from start_screen import StartScreen
@@ -10,8 +11,10 @@ from sprites.bomb_projectile import BombProjectile
 from weapon.bullet_gun import BulletGun
 from weapon.laser_gun import LaserGun
 from weapon.cross_gun import CrossGun
-from weapon.bomb_gun import BombGun
+from weapon_select_screen import WeaponSelectScreen
+from weapon.garlic_aura import Garlic
 from map1_view import View_Map
+from weapon.bomb_gun import BombGun
 from sprites.npc_spawner import NPCSpawner
 
 
@@ -44,12 +47,61 @@ def main():
         pygame.quit()
         sys.exit()
     
+    
+    # 무기 선택 화면 호출
+    weapon_selector = WeaponSelectScreen(screen, font)
+    selected_weapon_names = weapon_selector.select()
+    
     # 게임 UI 인스턴스 생성
     game_ui = GameUI(font)
     
+    # 마늘 무기 이미지 생성
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    image_path = os.path.join(base_path, "assets", "images", "garlic_aura.png")
+    garlic_image = pygame.image.load(image_path).convert_alpha()
+
     # 플레이어 및 NPC 생성
-    player = Player(SCREEN_WIDTH//2, SCREEN_HEIGHT//2)
+    player = Player(SCREEN_WIDTH//2, SCREEN_HEIGHT//2, garlic_image=garlic_image)
     player_group.add(player)
+
+    
+
+    # 선택된 무기 장착
+    for name in selected_weapon_names:
+        if name == "Bullet Gun":
+            bullet_gun = BulletGun(sprite_index=6)
+            bullet_gun.acquired = True
+            player.weapons.append(bullet_gun)
+        elif name == "Laser":
+            laser_gun = LaserGun()
+            laser_gun.acquired = True
+            player.weapons.append(laser_gun)
+        elif name == "Cross Gun":
+            cross = CrossGun(sprite_index=7)
+            cross.acquired = True
+            player.weapons.append(cross)
+        elif name == "Garlic":
+            garlic_aura = Garlic(player=player, image=garlic_image)
+            garlic_aura.acquired = True
+            player.weapons.append(garlic_aura)
+        elif name == "Bomb":
+            pass  # 미구현
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    npc = NPC(SCREEN_WIDTH//2 + 100, SCREEN_HEIGHT//2)
+    npc_group.add(npc)
+    for i in range(3):  # 3마리 추가 생성
+        npc = NPC(200 + i * 200, 200)
+        npc_group.add(npc)
+
     
     # 투사체 생성
     projectile_sprites = load_projectile_sprites("assets/images/projectiles.png")
@@ -135,7 +187,12 @@ def main():
         for weapon in player.weapons:
             if weapon.acquired:
                 weapon.update_timer(clock.get_time())
+
+                if hasattr(weapon, 'aura'):
+                    weapon.update(clock.get_time(), npc_group)
+
                 if weapon.can_fire():
+
                     # 가장 가까운 npc 찾기
                     if len(npc_group) > 0:
                         closest_npc = min(
@@ -185,13 +242,21 @@ def main():
             level=player.level  # 실제 레벨 값 연결
         )
 
-        
-        # 스프라이트 그리기
+        # 마늘 및 레이저 무기 그리기
+        for weapon in player.weapons:
+            if weapon.acquired and hasattr(weapon, 'aura'):
+                screen.blit(weapon.aura.image, weapon.aura.rect)
+            if weapon.acquired and isinstance(weapon, LaserGun):
+                weapon.draw(screen, player)
+
+        # 플레이어 그리기
         screen.blit(player.image, player.rect)
+
         # npc가 kill 당해서 npc_group에서 빠지면 그리지 않음.
         for npc in npc_group:
             screen.blit(npc.image, npc.rect)
         
+        # 투사체
         projectiles.draw(screen)
         
         # UI 그리기
