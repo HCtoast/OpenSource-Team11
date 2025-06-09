@@ -109,9 +109,10 @@ class NPC(pygame.sprite.Sprite):
                 self.current_frame = (self.current_frame + 1) % len(self.frames[self.current_state])
                 self.image = self.frames[self.current_state][self.current_frame]
     
-    def take_damage(self, amount):
+    def take_damage(self, amount,player):
         self.health -= amount
         if self.health <= 0:
+            player.exp +=25
             self.kill()
             return True
         return False
