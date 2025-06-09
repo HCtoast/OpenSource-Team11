@@ -4,7 +4,7 @@ from .weapon import Weapon
 class BombGun(Weapon):
     def __init__(self, sprite_index):
         super().__init__("Bomb Gun", base_damage=30, cooldown=2400)
-        self.sprite_index = sprite_index
+        self.sprite_index = 8
         self.projectilespeed = 3
         self.acquired = False  # 기본은 미획득
 

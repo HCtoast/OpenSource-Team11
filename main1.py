@@ -85,7 +85,9 @@ def main():
             garlic_aura.acquired = True
             player.weapons.append(garlic_aura)
         elif name == "Bomb":
-            pass  # 미구현
+            Bomb = BombGun(sprite_index=8)
+            Bomb.acquired = True
+            player.weapons.append(Bomb)
     
     
     
@@ -210,7 +212,8 @@ def main():
                     else:
                         closest_npc = None
                     if isinstance(weapon, LaserGun):
-                        weapon.fire(player, npc_group)
+                        weapon.update(clock.get_time(), npc_group, player)
+                        #weapon.fire(player, npc_group,projectile_sprites)
 
         # 투사체 위치 업뎃
         projectiles.update(clock.get_time())
